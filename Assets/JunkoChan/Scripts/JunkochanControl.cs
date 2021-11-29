@@ -9,20 +9,25 @@ public class JunkochanControl : MonoBehaviour {
 	private CharacterController JKCController;//Character controller component attached to Junkochan
 	private Animator JKCAnim;//Animator component attached to Junkochan
 	private float JumpTime;//Jump power limit
-	private float MoveSpeed;//Horizontal move speed
-	private float VertSpeed;//Verical move speed
+	private float MoveSpeed=2f;//Horizontal move speed
+	private float VertSpeed=2f;//Verical move speed
 	private float Height;//Current height of Junkochan (y value of transform.position)
-
+	private bool isMoving;
+	[SerializeField]
+	private FixedJoystick fixedJoystick;
 	// Use this for initialization
 	void Start () {
 		JKCCam = GameObject.Find("JunkochanCam");
 		JKCController = this.GetComponent<CharacterController>();
 		JKCAnim = this.GetComponent<Animator>();
 	}
+	void tryAttack()
+    {
 
+    }
 	// Update is called once per frame
 	void Update() {
-
+		/*
 #region ACTION
 		if (CheckGrounded() && Input.GetMouseButtonDown(0)) {//When left clicked while Junkochan is on the ground
 			JKCAnim.SetTrigger("Slash");//Play "Sword_Iai" animation in "ActionLayer" in Animator
@@ -36,18 +41,21 @@ public class JunkochanControl : MonoBehaviour {
 		if (JKCAnim.GetCurrentAnimatorStateInfo(1).IsName("Sword_Iai") || JKCAnim.GetCurrentAnimatorStateInfo(1).IsName("Sword_Guard") || JKCAnim.GetCurrentAnimatorStateInfo(1).IsName("Sword_Store")) {
 			return;//While the attacking / guarding animation is playing, do not go to below "MOVEMENT" process  
 		}
-#endregion
+#endregion*/
 
 
 #region MOVEMENT
-		InputH = Input.GetAxis("Horizontal");//Get keyboard input
-		InputV = Input.GetAxis("Vertical");//Get keyboard input
 		Vector3 CamForward = Vector3.Scale(JKCCam.transform.forward, new Vector3(1, 0, 1)).normalized;//Camera's forward direction
-		Vector3 MoveDirection = CamForward * InputV + JKCCam.transform.right * InputH;//Get Junkochan's forward direction seen from camera
+		Vector3 MoveDirection = -fixedJoystick.JoyVec;//Get Junkochan's forward direction seen from camera
 
 		if (MoveDirection.magnitude > 0) {//When any WASD key is pushed
+			isMoving = true;
 			transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(MoveDirection), 0.2f);//Rotate Junkochan to Inputting direction
 		}
+        else
+        {
+			isMoving = false;
+        }
 		if (CheckGrounded()) {//When Junkochan is on the ground
 			JKCAnim.SetBool("Grounded", true);//Set Junkochan's "Grounded" parameter in Animator component
 			JKCAnim.SetBool("Jump", false);
@@ -64,7 +72,7 @@ public class JunkochanControl : MonoBehaviour {
 			JKCAnim.SetBool("Move", false);
 		}
 
-		if (Input.GetKey(KeyCode.LeftShift)) {//When shift key is pushed
+		if (true) {//When shift key is pushed
 			MoveSpeed *= 2f;//Set Junkochan's moving speed as Running speed
 			JKCAnim.SetBool("Run", true);//Set Junkochan's "Run" parameter in Animator component
 		} else {
@@ -98,8 +106,9 @@ public class JunkochanControl : MonoBehaviour {
 
 		//JunckoChan Movement
 		if(!CheckGrounded())VertSpeed -= 0.2f;//Increase falling speed (worked as gravity acceleration)
-		JKCController.Move(MoveDirection*MoveSpeed*Time.deltaTime);//Horizontal movement
+		JKCController.Move(MoveDirection * MoveSpeed*Time.deltaTime);//Horizontal movement
 		JKCController.Move(Vector3.up*VertSpeed*Time.deltaTime);//Vertical movement
+		
 
 #endregion
 	}
