@@ -5,17 +5,20 @@ using UnityEngine;
 public class MonsterContoller : MonoBehaviour
 {
     public GameObject player;
-    public Animator anim;
+    private Animator anim;
+    public float walkspeed;
+    Rigidbody rigid;
     bool isattack = false;
     private void Start()
     {
         anim = GetComponent<Animator>();
+        rigid = GetComponent<Rigidbody>();
     }
     void Update()
     {
         lookatplayer();
         attackplayer();
-        StartCoroutine("Patrol");
+        Run();
 
     }
     void lookatplayer()
@@ -28,20 +31,24 @@ public class MonsterContoller : MonoBehaviour
        
         if (Vector3.Distance(transform.position, player.transform.position)<2f)
         {
+            anim.SetBool("Walking", false);
             isattack = true;
             anim.SetTrigger("Attack");
             isattack = false;
         }
         
     }
-
-    IEnumerator Patrol()
+    private void OnCollisionEnter(Collision collision)
+    {
+        
+    }
+    void Run()
     {
         if (!isattack)
         {
-            Vector3 target = new Vector3(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)) + transform.position;
+            Vector3 _velocity = transform.forward*walkspeed;
+            rigid.MovePosition(transform.position + _velocity * Time.deltaTime);
             anim.SetBool("Walking",true);
-            yield return new WaitForSeconds(2f);
         }
     }
 }
