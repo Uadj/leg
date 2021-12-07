@@ -47,7 +47,7 @@ public class MonsterContoller : MonoBehaviour
         if (!isattack)
         {
             Vector3 _velocity = transform.forward*walkspeed;
-            rigid.MovePosition(transform.position + _velocity * Time.deltaTime);
+            //rigid.MovePosition(transform.position + _velocity * Time.deltaTime);
             anim.SetBool("Walking",true);
         }
     }

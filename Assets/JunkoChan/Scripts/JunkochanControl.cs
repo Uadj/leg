@@ -13,8 +13,10 @@ public class JunkochanControl : MonoBehaviour {
 	private float VertSpeed=2f;//Verical move speed
 	private float Height;//Current height of Junkochan (y value of transform.position)
 	private bool isMoving;
+	public GameObject Char;
 	[SerializeField]
 	private FixedJoystick fixedJoystick;
+	private bool isTP = false;
 	// Use this for initialization
 	void Start () {
 		JKCCam = GameObject.Find("JunkochanCam");
@@ -104,18 +106,29 @@ public class JunkochanControl : MonoBehaviour {
 		}
 		Height = transform.position.y;//Memory current Junkochan's height
 
-		//JunckoChan Movement
-		if(!CheckGrounded())VertSpeed -= 0.2f;//Increase falling speed (worked as gravity acceleration)
-		JKCController.Move(MoveDirection * MoveSpeed*Time.deltaTime);//Horizontal movement
-		JKCController.Move(Vector3.up*VertSpeed*Time.deltaTime);//Vertical movement
-		
+        //JunckoChan Movement
+        if (!isTP)
+        {
+			if(!CheckGrounded())VertSpeed -= 0.2f;//Increase falling speed (worked as gravity acceleration)
+			JKCController.Move(MoveDirection * MoveSpeed*Time.deltaTime);//Horizontal movement
+			JKCController.Move(Vector3.up*VertSpeed*Time.deltaTime);//Vertical movement
+		}
 
-#endregion
+		#endregion
 	}
 
 	bool CheckGrounded() {//Judge whether Junkochan is on the ground or not
 		Ray ray = new Ray(this.transform.position+Vector3.up*0.05f,Vector3.down*0.1f);//Shoot ray at 0.05f upper from Junkochan's feet position to the ground with its length of 0.1f
 		return Physics.Raycast(ray, 0.1f);//If the ray hit the ground, return true
 	}
-
+    private void OnTriggerEnter(Collider other)
+    {
+		isTP = true;
+        if(other.tag == "portal")
+        {
+			Char.transform.position = new Vector3(124124, 24124, 4214124);
+			Destroy(Char);
+        }
+		isTP = false;
+	}
 }
